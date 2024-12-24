@@ -1,35 +1,41 @@
-# Import necessary libraries
-import smbus
-import time
+#include <Wire.h>
 
-# Define the I2C bus
-bus = smbus.SMBus(1)
-RTC_ADDRESS = 0x68  # Address of the DS3231 RTC module
+#define RTC_ADDRESS 0x68  // Address of the DS3231 RTC module
 
-def read_rtc():
-    # Read seconds, minutes, hours, day, date, month, year from RTC
-    data = bus.read_i2c_block_data(RTC_ADDRESS, 0x00, 7)
-    seconds = data[0] & 0x7F
-    minutes = data[1]
-    hours = data[2] & 0x3F
-    day = data[3]
-    date = data[4]
-    month = data[5] & 0x1F
-    year = data[6]
-    return seconds, minutes, hours, day, date, month, year
+void setup() {
+  Wire.begin(D2, D1); // Initialize I2C with SDA on D2 (GPIO 4) and SCL on D1 (GPIO 5)
+  Serial.begin(9600); // Initialize serial communication
+}
 
-try:
-    while True:
-        seconds, minutes, hours, day, date, month, year = read_rtc()
-        print(f"Date: {date:02d}/{month:02d}/{year:02d}")
-        print(f"Time: {hours:02d}:{minutes:02d}:{seconds:02d}")
-        time.sleep(1)
+void loop() {
+  int seconds, minutes, hours, day, date, month, year;
+  read_rtc(&seconds, &minutes, &hours, &day, &date, &month, &year);
+  Serial.printf("Date: %02d/%02d/%02d\n", date, month, year);
+  Serial.printf("Time: %02d:%02d:%02d\n", hours, minutes, seconds);
+  delay(1000); // Wait for 1 second before taking another measurement
+}
 
-except KeyboardInterrupt:
-    print("Program terminated")
+void read_rtc(int *seconds, int *minutes, int *hours, int *day, int *date, int *month, int *year) {
+  Wire.beginTransmission(RTC_ADDRESS);
+  Wire.write(0x00); // Set DS3231 register pointer to 00h
+  Wire.endTransmission();
+  Wire.requestFrom(RTC_ADDRESS, 7);
 
-# Connections:
-# - VCC pin of the RTC module to the 3.3V or 5V pin of the Raspberry Pi.
-# - GND pin of the RTC module to the GND pin of the Raspberry Pi.
-# - SDA pin of the RTC module to GPIO pin 2 (BCM numbering) of the Raspberry Pi.
-# - SCL pin of the RTC module to GPIO pin 3 (BCM numbering) of the Raspberry Pi.
+  *seconds = bcdToDec(Wire.read() & 0x7F);
+  *minutes = bcdToDec(Wire.read());
+  *hours = bcdToDec(Wire.read() & 0x3F);
+  *day = bcdToDec(Wire.read());
+  *date = bcdToDec(Wire.read());
+  *month = bcdToDec(Wire.read() & 0x1F);
+  *year = bcdToDec(Wire.read());
+}
+
+int bcdToDec(byte val) {
+  return ((val / 16 * 10) + (val % 16));
+}
+
+// Connections:
+// - VCC pin of the RTC module to the 3.3V pin of the NodeMCU.
+// - GND pin of the RTC module to the GND pin of the NodeMCU.
+// - SDA pin of the RTC module to GPIO pin D2 (GPIO 4).
+// - SCL pin of the RTC module to GPIO pin D1 (GPIO 5).
