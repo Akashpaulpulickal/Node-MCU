@@ -1,44 +1,38 @@
-# Import necessary libraries
-import RPi.GPIO as GPIO
-import time
+#include <ESP8266WiFi.h>
 
-# Set up GPIO mode
-GPIO.setmode(GPIO.BCM)
+// Define GPIO pins for vibration sensor and buzzer
+#define VIBRATION_SENSOR_PIN D1 // GPIO 5
+#define BUZZER_PIN D2 // GPIO 4
 
-# Define GPIO pins for vibration sensor and buzzer
-VIBRATION_SENSOR_PIN = 17
-BUZZER_PIN = 18
+void setup() {
+  // Set up vibration sensor pin as input
+  pinMode(VIBRATION_SENSOR_PIN, INPUT);
 
-# Set up vibration sensor pin as input
-GPIO.setup(VIBRATION_SENSOR_PIN, GPIO.IN)
+  // Set up buzzer pin as output
+  pinMode(BUZZER_PIN, OUTPUT);
 
-# Set up buzzer pin as output
-GPIO.setup(BUZZER_PIN, GPIO.OUT)
+  // Start the serial communication
+  Serial.begin(9600); // Set serial communication baud rate to 9600
+}
 
-try:
-    while True:
-        # Read the vibration sensor value
-        vibration_detected = GPIO.input(VIBRATION_SENSOR_PIN)
-        
-        if vibration_detected:
-            print("Vibration detected!")
-            GPIO.output(BUZZER_PIN, GPIO.HIGH)  # Turn on the buzzer
-        else:
-            GPIO.output(BUZZER_PIN, GPIO.LOW)  # Turn off the buzzer
-        
-        # Wait for a short period before checking again
-        time.sleep(0.5)
+void loop() {
+  // Read the vibration sensor value
+  int vibration_detected = digitalRead(VIBRATION_SENSOR_PIN);
+  
+  if (vibration_detected == LOW) {
+    Serial.println("Vibration detected!");
+    digitalWrite(BUZZER_PIN, HIGH);  // Turn on the buzzer
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);  // Turn off the buzzer
+  }
+  
+  // Wait for a short period before checking again
+  delay(500);
+}
 
-except KeyboardInterrupt:
-    print("Program terminated")
-
-finally:
-    # Clean up GPIO settings
-    GPIO.cleanup()
-
-# Connections:
-# - VCC pin of the vibration sensor to the 3.3V pin of the Raspberry Pi.
-# - GND pin of the vibration sensor to the GND pin of the Raspberry Pi.
-# - DO (Digital Output) pin of the vibration sensor to GPIO pin 17 (BCM numbering) of the Raspberry Pi.
-# - Positive pin of the buzzer to GPIO pin 18 (BCM numbering) of the Raspberry Pi.
-# - Negative pin of the buzzer to the GND pin of the Raspberry Pi.
+// Connections:
+// - VCC pin of the vibration sensor to the 3.3V pin of the NodeMCU.
+// - GND pin of the vibration sensor to the GND pin of the NodeMCU.
+// - DO (Digital Output) pin of the vibration sensor to GPIO pin D1 (GPIO 5).
+// - Positive pin of the buzzer to GPIO pin D2 (GPIO 4).
+// - Negative pin of the buzzer to the GND pin of the NodeMCU.
