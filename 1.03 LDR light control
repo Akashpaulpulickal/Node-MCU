@@ -1,0 +1,45 @@
+# Import necessary libraries
+import RPi.GPIO as GPIO
+import time
+
+# Set up GPIO mode
+GPIO.setmode(GPIO.BCM)
+
+# Define GPIO pins
+LDR_PIN = 17
+RELAY_PIN = 18
+
+# Set up GPIO pins
+GPIO.setup(LDR_PIN, GPIO.IN)
+GPIO.setup(RELAY_PIN, GPIO.OUT)
+
+try:
+    while True:
+        # Read the LDR sensor value
+        ldr_value = GPIO.input(LDR_PIN)
+        
+        if ldr_value == 0:  # Low light detected
+            GPIO.output(RELAY_PIN, GPIO.HIGH)  # Turn on the light
+            print("Light turned on")
+        else:
+            GPIO.output(RELAY_PIN, GPIO.LOW)  # Turn off the light
+            print("Light turned off")
+        
+        # Wait for a short period before checking again
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    print("Program terminated")
+
+finally:
+    # Clean up GPIO settings
+    GPIO.cleanup()
+
+# Connections:
+# - One end of the LDR to 3.3V pin of the Raspberry Pi.
+# - The other end of the LDR to a 10kΩ resistor and GPIO pin 17 (BCM numbering) of the Raspberry Pi.
+# - The other end of the 10kΩ resistor to the GND pin of the Raspberry Pi.
+# - VCC pin of the relay module to the 5V pin of the Raspberry Pi.
+# - GND pin of the relay module to the GND pin of the Raspberry Pi.
+# - IN pin of the relay module to GPIO pin 18 (BCM numbering) of the Raspberry Pi.
+# - Connect the light bulb or LED to the relay module as per the relay module's instructions.
