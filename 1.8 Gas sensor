@@ -1,48 +1,41 @@
-# Import necessary libraries
-import smbus
-import RPi.GPIO as GPIO
-import time
+#include <Wire.h>
 
-# Define the I2C bus
-bus = smbus.SMBus(1)
-ADC_ADDRESS = 0x48  # Address of the ADC
+#define ADC_ADDRESS 0x48  // Address of the ADC
+#define BUZZER_PIN D2 // GPIO 4
 
-# Define GPIO pin for buzzer
-BUZZER_PIN = 18
+void setup() {
+  Wire.begin(D2, D1); // Initialize I2C with SDA on D2 (GPIO 4) and SCL on D1 (GPIO 5)
+  pinMode(BUZZER_PIN, OUTPUT); // Set buzzer pin as output
+  Serial.begin(9600); // Initialize serial communication
+}
 
-# Set up GPIO mode
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(BUZZER_PIN, GPIO.OUT)
+void loop() {
+  int gas_value = read_adc(0);  // Read from channel 0
+  Serial.printf("Gas sensor value: %d\n", gas_value);
+  
+  if (gas_value > 100) {  // Threshold value for gas detection
+    digitalWrite(BUZZER_PIN, HIGH);
+    Serial.println("Gas detected! Buzzer ON");
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+    Serial.println("No gas detected. Buzzer OFF");
+  }
+  
+  delay(1000); // Wait for 1 second before taking another measurement
+}
 
-def read_adc(channel):
-    bus.write_byte(ADC_ADDRESS, channel)
-    value = bus.read_byte(ADC_ADDRESS)
-    return value
+int read_adc(int channel) {
+  Wire.beginTransmission(ADC_ADDRESS);
+  Wire.write(channel);
+  Wire.endTransmission();
+  Wire.requestFrom(ADC_ADDRESS, 1);
+  return Wire.read();
+}
 
-try:
-    while True:
-        gas_value = read_adc(0)  # Read from channel 0
-        print(f"Gas sensor value: {gas_value}")
-        
-        if gas_value > 100:  # Threshold value for gas detection
-            GPIO.output(BUZZER_PIN, GPIO.HIGH)
-            print("Gas detected! Buzzer ON")
-        else:
-            GPIO.output(BUZZER_PIN, GPIO.LOW)
-            print("No gas detected. Buzzer OFF")
-        
-        time.sleep(1)
-
-except KeyboardInterrupt:
-    print("Program terminated")
-
-finally:
-    GPIO.cleanup()
-
-# Connections:
-# - VCC pin of the gas sensor to the 5V pin of the Raspberry Pi.
-# - GND pin of the gas sensor to the GND pin of the Raspberry Pi.
-# - AO (Analog Output) pin of the gas sensor to an ADC (Analog-to-Digital Converter) input pin.
-# - Connect the ADC to the Raspberry Pi using the I2C interface.
-# - Positive pin of the buzzer to GPIO pin 18 (BCM numbering) of the Raspberry Pi.
-# - Negative pin of the buzzer to the GND pin of the Raspberry Pi.
+// Connections:
+// - VCC pin of the gas sensor to the 3.3V pin of the NodeMCU.
+// - GND pin of the gas sensor to the GND pin of the NodeMCU.
+// - AO (Analog Output) pin of the gas sensor to an ADC (Analog-to-Digital Converter) input pin.
+// - Connect the ADC to the NodeMCU using the I2C interface.
+// - Positive pin of the buzzer to GPIO pin D2 (GPIO 4).
+// - Negative pin of the buzzer to the GND pin of the NodeMCU.
