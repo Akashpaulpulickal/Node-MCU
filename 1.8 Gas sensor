@@ -1,0 +1,48 @@
+# Import necessary libraries
+import smbus
+import RPi.GPIO as GPIO
+import time
+
+# Define the I2C bus
+bus = smbus.SMBus(1)
+ADC_ADDRESS = 0x48  # Address of the ADC
+
+# Define GPIO pin for buzzer
+BUZZER_PIN = 18
+
+# Set up GPIO mode
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(BUZZER_PIN, GPIO.OUT)
+
+def read_adc(channel):
+    bus.write_byte(ADC_ADDRESS, channel)
+    value = bus.read_byte(ADC_ADDRESS)
+    return value
+
+try:
+    while True:
+        gas_value = read_adc(0)  # Read from channel 0
+        print(f"Gas sensor value: {gas_value}")
+        
+        if gas_value > 100:  # Threshold value for gas detection
+            GPIO.output(BUZZER_PIN, GPIO.HIGH)
+            print("Gas detected! Buzzer ON")
+        else:
+            GPIO.output(BUZZER_PIN, GPIO.LOW)
+            print("No gas detected. Buzzer OFF")
+        
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    print("Program terminated")
+
+finally:
+    GPIO.cleanup()
+
+# Connections:
+# - VCC pin of the gas sensor to the 5V pin of the Raspberry Pi.
+# - GND pin of the gas sensor to the GND pin of the Raspberry Pi.
+# - AO (Analog Output) pin of the gas sensor to an ADC (Analog-to-Digital Converter) input pin.
+# - Connect the ADC to the Raspberry Pi using the I2C interface.
+# - Positive pin of the buzzer to GPIO pin 18 (BCM numbering) of the Raspberry Pi.
+# - Negative pin of the buzzer to the GND pin of the Raspberry Pi.
