@@ -1,37 +1,31 @@
-# Import necessary libraries
-import RPi.GPIO as GPIO
-import time
+#include <ESP8266WiFi.h>
 
-# Set up GPIO mode
-GPIO.setmode(GPIO.BCM)
+// Define GPIO pin for IR sensor
+#define IR_SENSOR_PIN D1 // GPIO 5
 
-# Define GPIO pin for IR sensor
-IR_SENSOR_PIN = 17
+void setup() {
+  // Set up IR sensor pin as input
+  pinMode(IR_SENSOR_PIN, INPUT);
 
-# Set up IR sensor pin as input
-GPIO.setup(IR_SENSOR_PIN, GPIO.IN)
+  // Start the serial communication
+  Serial.begin(9600); // Set serial communication baud rate to 9600
+}
 
-try:
-    while True:
-        # Read the IR sensor value
-        obstacle_detected = GPIO.input(IR_SENSOR_PIN)
-        
-        if obstacle_detected:
-            print("Obstacle detected!")
-        else:
-            print("No obstacle detected.")
-        
-        # Wait for a short period before checking again
-        time.sleep(0.5)
+void loop() {
+  // Read the IR sensor value
+  int obstacle_detected = digitalRead(IR_SENSOR_PIN);
+  
+  if (obstacle_detected == LOW) {
+    Serial.println("Obstacle detected!");
+  } else {
+    Serial.println("No obstacle detected.");
+  }
+  
+  // Wait for a short period before checking again
+  delay(500);
+}
 
-except KeyboardInterrupt:
-    print("Program terminated")
-
-finally:
-    # Clean up GPIO settings
-    GPIO.cleanup()
-
-# Connections:
-# - VCC pin of the IR sensor to the 3.3V pin of the Raspberry Pi.
-# - GND pin of the IR sensor to the GND pin of the Raspberry Pi.
-# - OUT pin of the IR sensor to GPIO pin 17 (BCM numbering) of the Raspberry Pi.
+// Connections:
+// - VCC pin of the IR sensor to the 3.3V pin of the NodeMCU.
+// - GND pin of the IR sensor to the GND pin of the NodeMCU.
+// - OUT pin of the IR sensor to GPIO pin D1 (GPIO 5).
