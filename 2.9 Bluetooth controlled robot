@@ -1,88 +1,89 @@
-# Import necessary libraries
-import RPi.GPIO as GPIO
-import time
-import serial
+#include <ESP8266WiFi.h>
+#include <SoftwareSerial.h>
 
-# Set up GPIO mode
-GPIO.setmode(GPIO.BCM)
+// Define GPIO pins for motor driver
+#define IN1 D1 // GPIO 5
+#define IN2 D2 // GPIO 4
+#define IN3 D3 // GPIO 0
+#define IN4 D4 // GPIO 2
 
-# Define GPIO pins for motor driver
-IN1 = 17
-IN2 = 18
-IN3 = 22
-IN4 = 23
+// Set up serial communication with Bluetooth module
+SoftwareSerial BTSerial(D5, D6); // RX, TX
 
-# Set up motor driver pins as output
-GPIO.setup(IN1, GPIO.OUT)
-GPIO.setup(IN2, GPIO.OUT)
-GPIO.setup(IN3, GPIO.OUT)
-GPIO.setup(IN4, GPIO.OUT)
+void setup() {
+  // Set up motor driver pins as output
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
 
-# Set up serial communication with Bluetooth module
-ser = serial.Serial('/dev/ttyAMA0', 9600)
+  // Initialize Bluetooth serial communication
+  BTSerial.begin(9600);
+  Serial.begin(9600);
+}
 
-def move_forward():
-    GPIO.output(IN1, GPIO.HIGH)
-    GPIO.output(IN2, GPIO.LOW)
-    GPIO.output(IN3, GPIO.HIGH)
-    GPIO.output(IN4, GPIO.LOW)
+void loop() {
+  if (BTSerial.available()) {
+    char command = BTSerial.read();
+    if (command == 'F') {
+      move_forward();
+    } else if (command == 'B') {
+      move_backward();
+    } else if (command == 'L') {
+      turn_left();
+    } else if (command == 'R') {
+      turn_right();
+    } else if (command == 'S') {
+      stop();
+    }
+  }
+}
 
-def move_backward():
-    GPIO.output(IN1, GPIO.LOW)
-    GPIO.output(IN2, GPIO.HIGH)
-    GPIO.output(IN3, GPIO.LOW)
-    GPIO.output(IN4, GPIO.HIGH)
+void move_forward() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
 
-def turn_left():
-    GPIO.output(IN1, GPIO.LOW)
-    GPIO.output(IN2, GPIO.HIGH)
-    GPIO.output(IN3, GPIO.HIGH)
-    GPIO.output(IN4, GPIO.LOW)
+void move_backward() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
 
-def turn_right():
-    GPIO.output(IN1, GPIO.HIGH)
-    GPIO.output(IN2, GPIO.LOW)
-    GPIO.output(IN3, GPIO.LOW)
-    GPIO.output(IN4, GPIO.HIGH)
+void turn_left() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
 
-def stop():
-    GPIO.output(IN1, GPIO.LOW)
-    GPIO.output(IN2, GPIO.LOW)
-    GPIO.output(IN3, GPIO.LOW)
-    GPIO.output(IN4, GPIO.LOW)
+void turn_right() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
 
-try:
-    while True:
-        if ser.in_waiting > 0:
-            command = ser.read().decode('utf-8')
-            if command == 'F':
-                move_forward()
-            elif command == 'B':
-                move_backward()
-            elif command == 'L':
-                turn_left()
-            elif command == 'R':
-                turn_right()
-            elif command == 'S':
-                stop()
-        time.sleep(0.1)
+void stop() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
 
-except KeyboardInterrupt:
-    print("Program terminated")
-
-finally:
-    GPIO.cleanup()
-
-# Connections:
-# - VCC pin of the Bluetooth module to the 3.3V pin of the Raspberry Pi.
-# - GND pin of the Bluetooth module to the GND pin of the Raspberry Pi.
-# - TXD pin of the Bluetooth module to the RXD pin of the Raspberry Pi (GPIO 15).
-# - RXD pin of the Bluetooth module to the TXD pin of the Raspberry Pi (GPIO 14).
-# - IN1 of the motor driver to GPIO pin 17 (BCM numbering) of the Raspberry Pi.
-# - IN2 of the motor driver to GPIO pin 18 (BCM numbering) of the Raspberry Pi.
-# - IN3 of the motor driver to GPIO pin 22 (BCM numbering) of the Raspberry Pi.
-# - IN4 of the motor driver to GPIO pin 23 (BCM numbering) of the Raspberry Pi.
-# - VCC of the motor driver to the 5V pin of the Raspberry Pi.
-# - GND of the motor driver to the GND pin of the Raspberry Pi.
-# - Motor A to the left motor.
-# - Motor B to the right motor.
+// Connections:
+// - VCC pin of the Bluetooth module to the 3.3V pin of the NodeMCU.
+// - GND pin of the Bluetooth module to the GND pin of the NodeMCU.
+// - TXD pin of the Bluetooth module to the RXD pin of the NodeMCU (GPIO 3).
+// - RXD pin of the Bluetooth module to the TXD pin of the NodeMCU (GPIO 1).
+// - IN1 of the motor driver to GPIO pin D1 (GPIO 5).
+// - IN2 of the motor driver to GPIO pin D2 (GPIO 4).
+// - IN3 of the motor driver to GPIO pin D3 (GPIO 0).
+// - IN4 of the motor driver to GPIO pin D4 (GPIO 2).
+// - VCC of the motor driver to the 5V pin of the NodeMCU.
+// - GND of the motor driver to the GND pin of the NodeMCU.
+// - Motor A to the left motor.
+// - Motor B to the right motor.
