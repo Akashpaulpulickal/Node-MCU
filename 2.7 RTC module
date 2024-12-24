@@ -1,0 +1,35 @@
+# Import necessary libraries
+import smbus
+import time
+
+# Define the I2C bus
+bus = smbus.SMBus(1)
+RTC_ADDRESS = 0x68  # Address of the DS3231 RTC module
+
+def read_rtc():
+    # Read seconds, minutes, hours, day, date, month, year from RTC
+    data = bus.read_i2c_block_data(RTC_ADDRESS, 0x00, 7)
+    seconds = data[0] & 0x7F
+    minutes = data[1]
+    hours = data[2] & 0x3F
+    day = data[3]
+    date = data[4]
+    month = data[5] & 0x1F
+    year = data[6]
+    return seconds, minutes, hours, day, date, month, year
+
+try:
+    while True:
+        seconds, minutes, hours, day, date, month, year = read_rtc()
+        print(f"Date: {date:02d}/{month:02d}/{year:02d}")
+        print(f"Time: {hours:02d}:{minutes:02d}:{seconds:02d}")
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    print("Program terminated")
+
+# Connections:
+# - VCC pin of the RTC module to the 3.3V or 5V pin of the Raspberry Pi.
+# - GND pin of the RTC module to the GND pin of the Raspberry Pi.
+# - SDA pin of the RTC module to GPIO pin 2 (BCM numbering) of the Raspberry Pi.
+# - SCL pin of the RTC module to GPIO pin 3 (BCM numbering) of the Raspberry Pi.
