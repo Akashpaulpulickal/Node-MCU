@@ -1,5 +1,5 @@
 const int ldrPin = A0; // LDR connected to analog pin A0
-const int buzzerPin = D1; // Buzzer connected to digital pin D1
+const int buzzerPin = D1; // Buzzer connected to digital pin D1 (GPIO 5)
 int ldrValue = 0; // Variable to store LDR value
 int threshold = 500; // Threshold value for LDR
 
@@ -26,5 +26,5 @@ void loop() {
 // - One end of the LDR to 3.3V.
 // - The other end of the LDR to A0 (analog input) and a 10kΩ resistor.
 // - The other end of the 10kΩ resistor to GND.
-// - Positive pin of the buzzer to digital pin D1.
+// - Positive pin of the buzzer to digital pin D1 (GPIO 5).
 // - Negative pin of the buzzer to GND.
