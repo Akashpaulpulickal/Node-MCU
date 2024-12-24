@@ -1,0 +1,30 @@
+# Import necessary libraries
+import Adafruit_DHT
+import time
+
+# Define the sensor type and GPIO pin
+sensor = Adafruit_DHT.DHT22
+pin = 4  # GPIO pin where the sensor is connected
+
+try:
+    while True:
+        # Read the temperature and humidity
+        humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+        
+        if humidity is not None and temperature is not None:
+            print(f"Temperature: {temperature:.1f}°C")
+            print(f"Humidity: {humidity:.1f}%")
+        else:
+            print("Failed to retrieve data from the sensor")
+        
+        # Wait for a short period before checking again
+        time.sleep(2)
+
+except KeyboardInterrupt:
+    print("Program terminated")
+
+# Connections:
+# - VCC pin of the sensor to the 3.3V or 5V pin of the Raspberry Pi.
+# - GND pin of the sensor to the GND pin of the Raspberry Pi.
+# - DATA pin of the sensor to GPIO pin 4 of the Raspberry Pi.
+# - 10kΩ resistor between the VCC and DATA pins (for DHT11).
