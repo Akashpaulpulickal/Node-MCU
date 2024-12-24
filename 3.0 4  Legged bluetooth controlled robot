@@ -16,22 +16,22 @@ Servo servo12;
 
 // Define the Bluetooth serial communication
 #include <SoftwareSerial.h>
-SoftwareSerial BTSerial(10, 11); // RX, TX
+SoftwareSerial BTSerial(D1, D2); // RX, TX
 
 void setup() {
   // Attach the servos to the PWM pins
-  servo1.attach(3);
-  servo2.attach(5);
-  servo3.attach(6);
-  servo4.attach(9);
-  servo5.attach(10);
-  servo6.attach(11);
-  servo7.attach(3);
-  servo8.attach(5);
-  servo9.attach(6);
-  servo10.attach(9);
-  servo11.attach(10);
-  servo12.attach(11);
+  servo1.attach(D1);
+  servo2.attach(D2);
+  servo3.attach(D3);
+  servo4.attach(D4);
+  servo5.attach(D5);
+  servo6.attach(D6);
+  servo7.attach(D7);
+  servo8.attach(D8);
+  servo9.attach(D1);
+  servo10.attach(D2);
+  servo11.attach(D3);
+  servo12.attach(D4);
 
   // Initialize Bluetooth serial communication
   BTSerial.begin(9600);
@@ -76,10 +76,10 @@ void stopMovement() {
 }
 
 // Connections:
-// - VCC pin of the Bluetooth module to the 5V pin of the Arduino.
-// - GND pin of the Bluetooth module to the GND pin of the Arduino.
-// - TXD pin of the Bluetooth module to the RXD pin of the Arduino.
-// - RXD pin of the Bluetooth module to the TXD pin of the Arduino.
-// - Connect the servo motors to the PWM pins of the Arduino (e.g., pins 3, 5, 6, 9, 10, 11).
+// - VCC pin of the Bluetooth module to the 3.3V pin of the NodeMCU.
+// - GND pin of the Bluetooth module to the GND pin of the NodeMCU.
+// - TXD pin of the Bluetooth module to the RXD pin of the NodeMCU (GPIO 3).
+// - RXD pin of the Bluetooth module to the TXD pin of the NodeMCU (GPIO 1).
+// - Connect the servo motors to the PWM pins of the NodeMCU (e.g., D1, D2, D3, D4, D5, D6, D7, D8).
 // - VCC pin of the servo motors to an external power supply (e.g., 5V).
-// - GND pin of the servo motors to the GND pin of the Arduino and the external power supply.
+// - GND pin of the servo motors to the GND pin of the NodeMCU and the external power supply.
