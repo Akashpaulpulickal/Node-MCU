@@ -1,0 +1,104 @@
+#include <Servo.h>
+
+// Define the pins for the ultrasonic sensor and motors
+#define TRIG_PIN D1 // Trig pin of the ultrasonic sensor connected to digital pin D1 (GPIO 5)
+#define ECHO_PIN D2 // Echo pin of the ultrasonic sensor connected to digital pin D2 (GPIO 4)
+#define LEFT_MOTOR_FORWARD D3 // Left motor forward pin connected to digital pin D3 (GPIO 0)
+#define LEFT_MOTOR_BACKWARD D4 // Left motor backward pin connected to digital pin D4 (GPIO 2)
+#define RIGHT_MOTOR_FORWARD D5 // Right motor forward pin connected to digital pin D5 (GPIO 14)
+#define RIGHT_MOTOR_BACKWARD D6 // Right motor backward pin connected to digital pin D6 (GPIO 12)
+#define SERVO_PIN D7 // Servo motor pin connected to digital pin D7 (GPIO 13)
+
+Servo servo_motor;
+
+void setup() {
+  // Set the ultrasonic sensor and motor pins as output/input
+  pinMode(TRIG_PIN, OUTPUT); // Set trig pin as output
+  pinMode(ECHO_PIN, INPUT); // Set echo pin as input
+  pinMode(LEFT_MOTOR_FORWARD, OUTPUT); // Set left motor forward pin as output
+  pinMode(LEFT_MOTOR_BACKWARD, OUTPUT); // Set left motor backward pin as output
+  pinMode(RIGHT_MOTOR_FORWARD, OUTPUT); // Set right motor forward pin as output
+  pinMode(RIGHT_MOTOR_BACKWARD, OUTPUT); // Set right motor backward pin as output
+
+  // Attach the servo motor to its pin
+  servo_motor.attach(SERVO_PIN); // Attach servo motor to pin D7
+  servo_motor.write(90); // Set servo motor to center position
+
+  // Start the serial communication
+  Serial.begin(9600); // Set serial communication baud rate to 9600
+}
+
+void loop() {
+  int distance = measureDistance(); // Measure the distance to an obstacle
+
+  if (distance < 20) { // If an obstacle is detected within 20 cm
+    stop(); // Stop the robot
+    delay(500); // Wait for 0.5 seconds
+    int distanceRight = lookRight(); // Look to the right
+    int distanceLeft = lookLeft(); // Look to the left
+
+    if (distanceRight > distanceLeft) {
+      turnRight(); // Turn right if the right side is clearer
+    } else {
+      turnLeft(); // Turn left if the left side is clearer
+    }
+  } else {
+    moveForward(); // Move forward if no obstacle is detected
+  }
+}
+
+int measureDistance() {
+  digitalWrite(TRIG_PIN, LOW); // Ensure trig pin is low
+  delayMicroseconds(2); // Wait for 2 microseconds
+  digitalWrite(TRIG_PIN, HIGH); // Set trig pin high
+  delayMicroseconds(10); // Wait for 10 microseconds
+  digitalWrite(TRIG_PIN, LOW); // Set trig pin low
+
+  long duration = pulseIn(ECHO_PIN, HIGH); // Measure the duration of the echo pulse
+  int distance = duration * 0.034 / 2; // Calculate the distance in cm
+  return distance;
+}
+
+int lookRight() {
+  servo_motor.write(0); // Turn servo motor to the right
+  delay(500); // Wait for 0.5 seconds
+  int distance = measureDistance(); // Measure the distance to an obstacle
+  servo_motor.write(90); // Reset servo motor to center position
+  return distance;
+}
+
+int lookLeft() {
+  servo_motor.write(180); // Turn servo motor to the left
+  delay(500); // Wait for 0.5 seconds
+  int distance = measureDistance(); // Measure the distance to an obstacle
+  servo_motor.write(90); // Reset servo motor to center position
+  return distance;
+}
+
+void moveForward() {
+  digitalWrite(LEFT_MOTOR_FORWARD, HIGH); // Move left motor forward
+  digitalWrite(LEFT_MOTOR_BACKWARD, LOW); // Ensure left motor backward is off
+  digitalWrite(RIGHT_MOTOR_FORWARD, HIGH); // Move right motor forward
+  digitalWrite(RIGHT_MOTOR_BACKWARD, LOW); // Ensure right motor backward is off
+}
+
+void turnRight() {
+  digitalWrite(LEFT_MOTOR_FORWARD, HIGH); // Move left motor forward
+  digitalWrite(LEFT_MOTOR_BACKWARD, LOW); // Ensure left motor backward is off
+  digitalWrite(RIGHT_MOTOR_FORWARD, LOW); // Stop right motor forward
+  digitalWrite(RIGHT_MOTOR_BACKWARD, HIGH); // Move right motor backward
+}
+
+void turnLeft() {
+  digitalWrite(LEFT_MOTOR_FORWARD, LOW); // Stop left motor forward
+  digitalWrite(LEFT_MOTOR_BACKWARD, HIGH); // Move left motor backward
+  digitalWrite(RIGHT_MOTOR_FORWARD, HIGH); // Move right motor forward
+  digitalWrite(RIGHT_MOTOR_BACKWARD, LOW); // Ensure right motor backward is off
+}
+
+void stop() {
+  digitalWrite(LEFT_MOTOR_FORWARD, LOW); // Stop left motor forward
+  digitalWrite(LEFT_MOTOR_BACKWARD, LOW); // Ensure left motor backward is off
+  digitalWrite(RIGHT_MOTOR_FORWARD, LOW); // Stop right motor forward
+  digitalWrite(RIGHT_MOTOR_BACKWARD, LOW); // Ensure right motor backward is off
+}
