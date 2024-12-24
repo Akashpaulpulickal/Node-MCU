@@ -1,0 +1,37 @@
+# Import necessary libraries
+import RPi.GPIO as GPIO
+import time
+
+# Set up GPIO mode
+GPIO.setmode(GPIO.BCM)
+
+# Define GPIO pin for sound sensor
+SOUND_SENSOR_PIN = 17
+
+# Set up sound sensor pin as input
+GPIO.setup(SOUND_SENSOR_PIN, GPIO.IN)
+
+try:
+    while True:
+        # Read the sound sensor value
+        sound_detected = GPIO.input(SOUND_SENSOR_PIN)
+        
+        if sound_detected:
+            print("Sound detected!")
+        else:
+            print("No sound detected.")
+        
+        # Wait for a short period before checking again
+        time.sleep(0.5)
+
+except KeyboardInterrupt:
+    print("Program terminated")
+
+finally:
+    # Clean up GPIO settings
+    GPIO.cleanup()
+
+# Connections:
+# - VCC pin of the sound sensor to the 3.3V pin of the Raspberry Pi.
+# - GND pin of the sound sensor to the GND pin of the Raspberry Pi.
+# - OUT pin of the sound sensor to GPIO pin 17 (BCM numbering) of the Raspberry Pi.
