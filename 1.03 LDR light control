@@ -1,45 +1,40 @@
-# Import necessary libraries
-import RPi.GPIO as GPIO
-import time
+#include <ESP8266WiFi.h>
 
-# Set up GPIO mode
-GPIO.setmode(GPIO.BCM)
+// Define GPIO pins
+#define LDR_PIN D1 // GPIO 5
+#define RELAY_PIN D2 // GPIO 4
 
-# Define GPIO pins
-LDR_PIN = 17
-RELAY_PIN = 18
+void setup() {
+  // Set up GPIO pins
+  pinMode(LDR_PIN, INPUT);
+  pinMode(RELAY_PIN, OUTPUT);
 
-# Set up GPIO pins
-GPIO.setup(LDR_PIN, GPIO.IN)
-GPIO.setup(RELAY_PIN, GPIO.OUT)
+  // Start the serial communication
+  Serial.begin(9600); // Set serial communication baud rate to 9600
+}
 
-try:
-    while True:
-        # Read the LDR sensor value
-        ldr_value = GPIO.input(LDR_PIN)
-        
-        if ldr_value == 0:  # Low light detected
-            GPIO.output(RELAY_PIN, GPIO.HIGH)  # Turn on the light
-            print("Light turned on")
-        else:
-            GPIO.output(RELAY_PIN, GPIO.LOW)  # Turn off the light
-            print("Light turned off")
-        
-        # Wait for a short period before checking again
-        time.sleep(0.1)
+void loop() {
+  // Read the LDR sensor value
+  int ldr_value = digitalRead(LDR_PIN);
+  
+  if (ldr_value == LOW) {  // Low light detected
+    digitalWrite(RELAY_PIN, HIGH);  // Turn on the light
+    Serial.println("Light turned on");
+  } else {
+    digitalWrite(RELAY_PIN, LOW);  // Turn off the light
+    Serial.println("Light turned off");
+  }
+  
+  // Wait for a short period before checking again
+  delay(100);
+}
 
-except KeyboardInterrupt:
-    print("Program terminated")
+// Connections:
+// - One end of the LDR to 3.3V pin of the NodeMCU.
+// - The other end of the LDR to a 10kΩ resistor and GPIO pin D1 (GPIO 5).
+// - The other end of the 10kΩ resistor to the GND pin of the NodeMCU.
+// - VCC pin of the relay module to the 3.3V pin of the NodeMCU.
+// - GND pin of the relay module to the GND pin of the NodeMCU.
+// - IN pin of the relay module to GPIO pin D2 (GPIO 4).
+// - Connect the light bulb or LED to the relay module as per the relay module's instructions.
 
-finally:
-    # Clean up GPIO settings
-    GPIO.cleanup()
-
-# Connections:
-# - One end of the LDR to 3.3V pin of the Raspberry Pi.
-# - The other end of the LDR to a 10kΩ resistor and GPIO pin 17 (BCM numbering) of the Raspberry Pi.
-# - The other end of the 10kΩ resistor to the GND pin of the Raspberry Pi.
-# - VCC pin of the relay module to the 5V pin of the Raspberry Pi.
-# - GND pin of the relay module to the GND pin of the Raspberry Pi.
-# - IN pin of the relay module to GPIO pin 18 (BCM numbering) of the Raspberry Pi.
-# - Connect the light bulb or LED to the relay module as per the relay module's instructions.
