@@ -1,33 +1,28 @@
-# Import necessary libraries
-import smbus
-import time
+#include <Wire.h>
 
-# Define the I2C bus
-bus = smbus.SMBus(1)
-ADC_ADDRESS = 0x48  # Address of the ADC
+#define ADC_ADDRESS 0x48  // Address of the ADC
 
-def read_adc(channel):
-    bus.write_byte(ADC_ADDRESS, channel)
-    value = bus.read_byte(ADC_ADDRESS)
-    return value
+void setup() {
+  Wire.begin(D2, D1); // Initialize I2C with SDA on D2 (GPIO 4) and SCL on D1 (GPIO 5)
+  Serial.begin(9600); // Initialize serial communication
+}
 
-try:
-    while True:
-        soil_moisture_value = read_adc(0)  # Read from channel 0
-        print(f"Soil moisture value: {soil_moisture_value}")
-        
-        # Wait for a short period before checking again
-        time.sleep(1)
+void loop() {
+  int soil_moisture_value = read_adc(0);  // Read from channel 0
+  Serial.printf("Soil moisture value: %d\n", soil_moisture_value);
+  delay(1000); // Wait for 1 second before taking another measurement
+}
 
-except KeyboardInterrupt:
-    print("Program terminated")
+int read_adc(int channel) {
+  Wire.beginTransmission(ADC_ADDRESS);
+  Wire.write(channel);
+  Wire.endTransmission();
+  Wire.requestFrom(ADC_ADDRESS, 1);
+  return Wire.read();
+}
 
-finally:
-    # Clean up resources
-    bus.close()
-
-# Connections:
-# - VCC pin of the soil moisture sensor to the 3.3V or 5V pin of the Raspberry Pi.
-# - GND pin of the soil moisture sensor to the GND pin of the Raspberry Pi.
-# - AO (Analog Output) pin of the soil moisture sensor to an ADC (Analog-to-Digital Converter) input pin.
-# - Connect the ADC to the Raspberry Pi using the I2C interface.
+// Connections:
+// - VCC pin of the soil moisture sensor to the 3.3V pin of the NodeMCU.
+// - GND pin of the soil moisture sensor to the GND pin of the NodeMCU.
+// - AO (Analog Output) pin of the soil moisture sensor to an ADC (Analog-to-Digital Converter) input pin.
+// - Connect the ADC to the NodeMCU using the I2C interface.
