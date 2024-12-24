@@ -1,0 +1,37 @@
+# Import necessary libraries
+import RPi.GPIO as GPIO
+import time
+
+# Set up GPIO mode
+GPIO.setmode(GPIO.BCM)
+
+# Define GPIO pin for IR sensor
+IR_SENSOR_PIN = 17
+
+# Set up IR sensor pin as input
+GPIO.setup(IR_SENSOR_PIN, GPIO.IN)
+
+try:
+    while True:
+        # Read the IR sensor value
+        obstacle_detected = GPIO.input(IR_SENSOR_PIN)
+        
+        if obstacle_detected:
+            print("Obstacle detected!")
+        else:
+            print("No obstacle detected.")
+        
+        # Wait for a short period before checking again
+        time.sleep(0.5)
+
+except KeyboardInterrupt:
+    print("Program terminated")
+
+finally:
+    # Clean up GPIO settings
+    GPIO.cleanup()
+
+# Connections:
+# - VCC pin of the IR sensor to the 3.3V pin of the Raspberry Pi.
+# - GND pin of the IR sensor to the GND pin of the Raspberry Pi.
+# - OUT pin of the IR sensor to GPIO pin 17 (BCM numbering) of the Raspberry Pi.
