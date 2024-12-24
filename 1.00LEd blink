@@ -1,0 +1,22 @@
+// Define the LED pin
+const int ledPin = D1; // GPIO 5
+
+void setup() {
+  // Initialize the LED pin as an output
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  // Turn the LED on
+  digitalWrite(ledPin, HIGH);
+  delay(1000); // Wait for 1 second
+
+  // Turn the LED off
+  digitalWrite(ledPin, LOW);
+  delay(1000); // Wait for 1 second
+}
+
+// Connections:
+// - Anode (longer leg) of the LED to D1 (GPIO 5) pin of the NodeMCU.
+// - Cathode (shorter leg) of the LED to a 220Ω resistor.
+// - The other end of the 220Ω resistor to the GND pin of the NodeMCU.
