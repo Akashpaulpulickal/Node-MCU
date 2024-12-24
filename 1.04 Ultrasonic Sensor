@@ -1,49 +1,39 @@
-# Import necessary libraries
-import RPi.GPIO as GPIO
-import time
+#include <ESP8266WiFi.h>
 
-# Set up GPIO mode
-GPIO.setmode(GPIO.BCM)
+// Define GPIO pins for ultrasonic sensor
+#define TRIG_PIN D1 // GPIO 5
+#define ECHO_PIN D2 // GPIO 4
 
-# Define GPIO pins for ultrasonic sensor
-TRIG = 23
-ECHO = 24
+void setup() {
+  // Set up ultrasonic sensor pins
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
 
-# Set up ultrasonic sensor pins
-GPIO.setup(TRIG, GPIO.OUT)
-GPIO.setup(ECHO, GPIO.IN)
+  // Start the serial communication
+  Serial.begin(9600); // Set serial communication baud rate to 9600
+}
 
-def measure_distance():
-    GPIO.output(TRIG, True)
-    time.sleep(0.00001)
-    GPIO.output(TRIG, False)
-    start_time = time.time()
-    stop_time = time.time()
-    
-    while GPIO.input(ECHO) == 0:
-        start_time = time.time()
-    
-    while GPIO.input(ECHO) == 1:
-        stop_time = time.time()
-    
-    time_elapsed = stop_time - start_time
-    distance = (time_elapsed * 34300) / 2
-    return distance
+void loop() {
+  // Measure the distance
+  long distance = measure_distance();
+  Serial.printf("Distance: %.2f cm\n", distance);
+  delay(1000); // Wait for 1 second before taking another measurement
+}
 
-try:
-    while True:
-        distance = measure_distance()
-        print(f"Distance: {distance:.2f} cm")
-        time.sleep(1)
+long measure_distance() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
 
-except KeyboardInterrupt:
-    print("Program terminated")
+  long duration = pulseIn(ECHO_PIN, HIGH);
+  long distance = (duration * 0.034) / 2;
+  return distance;
+}
 
-finally:
-    GPIO.cleanup()
-
-# Connections:
-# - VCC pin of the ultrasonic sensor to the 5V pin of the Raspberry Pi.
-# - GND pin of the ultrasonic sensor to the GND pin of the Raspberry Pi.
-# - TRIG pin of the ultrasonic sensor to GPIO pin 23 (BCM numbering) of the Raspberry Pi.
-# - ECHO pin of the ultrasonic sensor to GPIO pin 24 (BCM numbering) of the Raspberry Pi.
+// Connections:
+// - VCC pin of the ultrasonic sensor to the 3.3V pin of the NodeMCU.
+// - GND pin of the ultrasonic sensor to the GND pin of the NodeMCU.
+// - TRIG pin of the ultrasonic sensor to GPIO pin D1 (GPIO 5).
+// - ECHO pin of the ultrasonic sensor to GPIO pin D2 (GPIO 4).
