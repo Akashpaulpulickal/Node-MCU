@@ -1,37 +1,31 @@
-# Import necessary libraries
-import RPi.GPIO as GPIO
-import time
+#include <ESP8266WiFi.h>
 
-# Set up GPIO mode
-GPIO.setmode(GPIO.BCM)
+// Define GPIO pin for tilt sensor
+#define TILT_SENSOR_PIN D1 // GPIO 5
 
-# Define GPIO pin for tilt sensor
-TILT_SENSOR_PIN = 17
+void setup() {
+  // Set up tilt sensor pin as input
+  pinMode(TILT_SENSOR_PIN, INPUT);
 
-# Set up tilt sensor pin as input
-GPIO.setup(TILT_SENSOR_PIN, GPIO.IN)
+  // Start the serial communication
+  Serial.begin(9600); // Set serial communication baud rate to 9600
+}
 
-try:
-    while True:
-        # Read the tilt sensor value
-        tilt_detected = GPIO.input(TILT_SENSOR_PIN)
-        
-        if tilt_detected:
-            print("Tilt detected!")
-        else:
-            print("No tilt detected.")
-        
-        # Wait for a short period before checking again
-        time.sleep(0.5)
+void loop() {
+  // Read the tilt sensor value
+  int tilt_detected = digitalRead(TILT_SENSOR_PIN);
+  
+  if (tilt_detected == LOW) {
+    Serial.println("Tilt detected!");
+  } else {
+    Serial.println("No tilt detected.");
+  }
+  
+  // Wait for a short period before checking again
+  delay(500);
+}
 
-except KeyboardInterrupt:
-    print("Program terminated")
-
-finally:
-    # Clean up GPIO settings
-    GPIO.cleanup()
-
-# Connections:
-# - VCC pin of the tilt sensor to the 3.3V pin of the Raspberry Pi.
-# - GND pin of the tilt sensor to the GND pin of the Raspberry Pi.
-# - OUT pin of the tilt sensor to GPIO pin 17 (BCM numbering) of the Raspberry Pi.
+// Connections:
+// - VCC pin of the tilt sensor to the 3.3V pin of the NodeMCU.
+// - GND pin of the tilt sensor to the GND pin of the NodeMCU.
+// - OUT pin of the tilt sensor to GPIO pin D1 (GPIO 5).
