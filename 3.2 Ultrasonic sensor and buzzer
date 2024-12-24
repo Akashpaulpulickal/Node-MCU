@@ -1,0 +1,43 @@
+// Define the pins for the ultrasonic sensor and buzzer
+#define TRIG_PIN D1 // Trig pin of the ultrasonic sensor connected to digital pin D1 (GPIO 5)
+#define ECHO_PIN D2 // Echo pin of the ultrasonic sensor connected to digital pin D2 (GPIO 4)
+#define BUZZER_PIN D3 // Buzzer connected to digital pin D3 (GPIO 0)
+
+void setup() {
+  // Set the ultrasonic sensor and buzzer pins as output/input
+  pinMode(TRIG_PIN, OUTPUT); // Set trig pin as output
+  pinMode(ECHO_PIN, INPUT); // Set echo pin as input
+  pinMode(BUZZER_PIN, OUTPUT); // Set buzzer pin as output
+
+  // Start the serial communication
+  Serial.begin(9600); // Set serial communication baud rate to 9600
+}
+
+void loop() {
+  // Send a pulse to the ultrasonic sensor
+  digitalWrite(TRIG_PIN, LOW); // Ensure trig pin is low
+  delayMicroseconds(2); // Wait for 2 microseconds
+  digitalWrite(TRIG_PIN, HIGH); // Set trig pin high
+  delayMicroseconds(10); // Wait for 10 microseconds
+  digitalWrite(TRIG_PIN, LOW); // Set trig pin low
+
+  // Measure the duration of the echo pulse
+  long duration = pulseIn(ECHO_PIN, HIGH); // Measure the duration of the echo pulse
+
+  // Calculate the distance in centimeters
+  long distance = duration * 0.034 / 2; // Calculate the distance in cm
+
+  // Print the distance to the serial monitor
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // If the distance is less than a threshold, turn on the buzzer
+  if (distance < 10) { // Adjust the threshold as needed
+    digitalWrite(BUZZER_PIN, HIGH); // Turn on the buzzer
+  } else {
+    digitalWrite(BUZZER_PIN, LOW); // Turn off the buzzer
+  }
+
+  delay(1000); // Wait for 1 second before taking another measurement
+}
