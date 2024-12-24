@@ -1,0 +1,85 @@
+#include <Servo.h>
+
+// Define the servo objects
+Servo servo1;
+Servo servo2;
+Servo servo3;
+Servo servo4;
+Servo servo5;
+Servo servo6;
+Servo servo7;
+Servo servo8;
+Servo servo9;
+Servo servo10;
+Servo servo11;
+Servo servo12;
+
+// Define the Bluetooth serial communication
+#include <SoftwareSerial.h>
+SoftwareSerial BTSerial(10, 11); // RX, TX
+
+void setup() {
+  // Attach the servos to the PWM pins
+  servo1.attach(3);
+  servo2.attach(5);
+  servo3.attach(6);
+  servo4.attach(9);
+  servo5.attach(10);
+  servo6.attach(11);
+  servo7.attach(3);
+  servo8.attach(5);
+  servo9.attach(6);
+  servo10.attach(9);
+  servo11.attach(10);
+  servo12.attach(11);
+
+  // Initialize Bluetooth serial communication
+  BTSerial.begin(9600);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (BTSerial.available()) {
+    char command = BTSerial.read();
+    if (command == 'F') {
+      moveForward();
+    } else if (command == 'B') {
+      moveBackward();
+    } else if (command == 'L') {
+      turnLeft();
+    } else if (command == 'R') {
+      turnRight();
+    } else if (command == 'S') {
+      stopMovement();
+    }
+  }
+}
+
+void moveForward() {
+  // Add code to move the robot forward
+}
+
+void moveBackward() {
+  // Add code to move the robot backward
+}
+
+void turnLeft() {
+  // Add code to turn the robot left
+}
+
+void turnRight() {
+  // Add code to turn the robot right
+}
+
+void stopMovement() {
+  // Add code to stop the robot
+}
+
+// Connections:
+// - VCC pin of the Bluetooth module to the 5V pin of the Arduino.
+// - GND pin of the Bluetooth module to the GND pin of the Arduino.
+// - TXD pin of the Bluetooth module to the RXD pin of the Arduino.
+// - RXD pin of the Bluetooth module to the TXD pin of the Arduino.
+// - Connect the servo motors to the PWM pins of the Arduino (e.g., pins 3, 5, 6, 9, 10, 11).
+// - VCC pin of the servo motors to an external power supply (e.g., 5V).
+// - GND pin of the servo motors to the GND pin of the Arduino and the external power supply.
